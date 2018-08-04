@@ -1,12 +1,12 @@
-const express = require('express'),
-      socketIO = require('socket.io'),
-      http     = require('http'),
-      app     = express();
+var express = require('express'),
+    socketIO = require('socket.io'),
+    http     = require('http'),
+    app     = express();
 
-const {generateMessage, generateLocationMessage} = require('./utils/message');
+var {generateMessage, generateLocationMessage} = require('./utils/message');
 
 app.use(express.static(`${__dirname}/public`));
-const port = process.env.PORT || 1337;
+var port = process.env.PORT || 1337;
 
 var server = http.createServer(app);
 var io     = socketIO(server);
