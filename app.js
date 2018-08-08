@@ -4,6 +4,7 @@ var express = require('express'),
     app     = express();
 
 var {generateMessage, generateLocationMessage} = require('./utils/message');
+var {isRealString} = require('./utils/validation');
 
 app.use(express.static(`${__dirname}/public`));
 var port = process.env.PORT || 1337;
@@ -14,9 +15,17 @@ var io     = socketIO(server);
 io.on('connection',(socket) => {
   console.log('New User Connected');
 
-  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+  socket.on('join', (params, callback) => {
+    if(!isRealString(params.name) || !isRealString(params.room)) {
+      callback('Name And Room Name Are Required');
+    }
 
-  socket.broadcast.emit('newMessage',generateMessage('Admin', 'New User Joined'));
+    socket.join(params.room);
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+
+    socket.broadcast.to(params.room).emit('newMessage',generateMessage('Admin', `${params.name} has joined the chat`));
+    callback();
+  });
 
   socket.on('createMessage', (message, callback) => {
     console.log(message);
